@@ -226,6 +226,12 @@
             _inactivityTimer = nil;
         }
         [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+        if (self.onStreamExit != nil) {
+            void (^exitBlock)(void) = self.onStreamExit;
+            self.onStreamExit = nil;
+            dispatch_async(dispatch_get_main_queue(), exitBlock);
+        }
     }
 }
 

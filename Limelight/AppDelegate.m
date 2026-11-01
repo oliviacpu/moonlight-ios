@@ -8,6 +8,10 @@
 
 #import "AppDelegate.h"
 
+#if TARGET_OS_TV
+#import "Moonlight-Swift.h"
+#endif
+
 @implementation AppDelegate
 
 @synthesize managedObjectContext = _managedObjectContext;
@@ -23,7 +27,16 @@ static NSString* DB_NAME = @"Limelight_iOS.sqlite";
 #endif
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-#if !TARGET_OS_TV
+#if TARGET_OS_TV
+    // The shelf UI is SwiftUI hosted in a UINavigationController so that
+    // StreamFrameViewController can still pop itself back to the root.
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    UIViewController* root = [ShelfAppRoot makeRootViewController];
+    UINavigationController* navigation = [[UINavigationController alloc] initWithRootViewController:root];
+    navigation.navigationBarHidden = YES;
+    self.window.rootViewController = navigation;
+    [self.window makeKeyAndVisible];
+#else
     UIApplicationShortcutItem* shortcut = [launchOptions valueForKey:UIApplicationLaunchOptionsShortcutItemKey];
     if (shortcut != nil) {
         _pcUuidToLoad = (NSString*)[shortcut.userInfo objectForKey:@"UUID"];

@@ -21,6 +21,10 @@
 #endif
 @property (nonatomic) StreamConfiguration* streamConfig;
 
+// Fired on the main thread after this controller has been popped and cleaned up.
+// Used by the tvOS shelf UI, which has no segue to return to.
+@property (nonatomic, copy) void (^onStreamExit)(void);
+
 -(void)updatePreferredDisplayMode:(BOOL)streamActive;
 
 @end

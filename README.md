@@ -1,3 +1,47 @@
+# Shelf (Apple TV)
+
+Shelf is a personal Apple TV client for [Sunshine](https://github.com/LizardByte/Sunshine)
+built on this fork of [Moonlight for iOS/tvOS](https://github.com/moonlight-stream/moonlight-ios).
+It replaces the flat app grid with **pick a platform → pick a game → play**.
+The pairing, HTTP and streaming engine is Moonlight's, unchanged; only the tvOS
+interface is new. GPLv3, like Moonlight.
+
+How it groups games: Sunshine app names are expected to be `<Platform> · <Title>`
+(middle dot, U+00B7). The text before the dot becomes the platform tile; the rest
+is the game. Names without a dot land under "Other". The Monochrome host writes
+names in that form from its RomM catalog.
+
+## Build and run on an Apple TV
+
+1. Mac with Xcode 16 or newer. Clone **with submodules**:
+
+       git clone --recurse-submodules https://github.com/oliviacpu/moonlight-ios
+       cd moonlight-ios && git checkout shelf
+
+2. Open `Moonlight.xcodeproj`. Wait for Swift packages (OpenSSL) to resolve.
+3. Select the **Moonlight TV** target → Signing & Capabilities → pick your Team.
+   The bundle identifier is `zone.olivia.shelf`; change it if Xcode complains.
+4. Pair the Apple TV: on the TV, Settings → Remotes and Devices → Remote App and
+   Devices; in Xcode, Window → Devices and Simulators → pair, enter the code.
+5. Choose the Apple TV as the run destination and press Run.
+
+First launch: Shelf looks for Sunshine over Bonjour. Pick the PC (or type its
+address), a PIN appears; enter it in Sunshine's web UI under PIN. After that the
+app opens straight to the platform rail.
+
+Controls: Menu/Back goes up one level. In a stream, press Play/Pause (or press
+Menu twice) to come back to the shelf; the host keeps the game running, and
+tapping its card again resumes it.
+
+The tvOS simulator shows the rail and shelves (it can discover, pair and fetch
+the game list over your LAN) but cannot stream.
+
+New code lives in `Moonlight TV/Shelf/`. Changes to upstream files are limited to
+`AppDelegate.m` (window setup), `StreamFrameViewController.h/.m` (an exit
+callback), the bridging header, `Moonlight TV/Info.plist`, and the project file.
+
+---
+
 # Moonlight iOS/tvOS
 
 [![CI](https://github.com/moonlight-stream/moonlight-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/moonlight-stream/moonlight-ios/actions/workflows/ci.yml)
