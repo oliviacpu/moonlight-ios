@@ -30,14 +30,27 @@ enum ShelfGrouping {
     static let preferredOrder = ["Dreamcast", "GameCube", "PlayStation 2", "Xbox"]
     static let otherTitle = "Other"
 
+    /// Platform labels the Monochrome host uses (systems.py). Lets the parser
+    /// accept both "<Platform> · <Title>" and the older "<Title> · <Platform>".
+    static let knownPlatforms: Set<String> = [
+        "Dreamcast", "GameCube", "PlayStation 2", "Xbox", "PlayStation", "NES",
+        "Super Nintendo", "Game Boy", "Game Boy Color", "Game Boy Advance", "Genesis",
+        "Master System", "Game Gear", "Sega CD", "Nintendo DS", "Nintendo 64",
+    ]
+
     static func game(for app: ShelfAppInfo) -> ShelfGame {
         let name = app.name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let range = name.range(of: separator) {
-            let platform = String(name[..<range.lowerBound]).trimmingCharacters(in: .whitespaces)
-            let title = String(name[range.upperBound...]).trimmingCharacters(in: .whitespaces)
-            if !platform.isEmpty && !title.isEmpty {
-                return ShelfGame(appID: app.appID, fullName: name, title: title, platform: platform)
+        let parts = name.components(separatedBy: separator)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        if parts.count >= 2 {
+            if let last = parts.last, knownPlatforms.contains(last) {
+                let title = parts.dropLast().joined(separator: separator)
+                return ShelfGame(appID: app.appID, fullName: name, title: title, platform: last)
             }
+            let platform = parts[0]
+            let title = parts.dropFirst().joined(separator: separator)
+            return ShelfGame(appID: app.appID, fullName: name, title: title, platform: platform)
         }
         return ShelfGame(appID: app.appID, fullName: name, title: name, platform: otherTitle)
     }
