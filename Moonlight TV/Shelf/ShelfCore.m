@@ -51,6 +51,7 @@
     NSOperationQueue *_opQueue;
     NSData *_clientCert;
     NSTimer *_poll;
+    NSTimeInterval _lastRefresh;
     BOOL _discovering;
     BOOL _booted;
 }
@@ -62,6 +63,7 @@
 @synthesize apps = _apps;
 @synthesize discoveredHosts = _discoveredHosts;
 @synthesize isStreaming = _isStreaming;
+@synthesize artworkVersion = _artworkVersion;
 
 + (ShelfCore *)shared {
     static ShelfCore *instance;
@@ -293,6 +295,12 @@ static void onMain(dispatch_block_t block) {
     if (host == nil || _isStreaming) {
         return;
     }
+    // Launch and the did-become-active notification both ask; one round trip is enough.
+    NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
+    if (now - _lastRefresh < 1.0) {
+        return;
+    }
+    _lastRefresh = now;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         HttpManager *hMan = [[HttpManager alloc] initWithHost:host];
         ServerInfoResponse *serverInfoResp = [[ServerInfoResponse alloc] init];
@@ -693,7 +701,10 @@ static void onMain(dispatch_block_t block) {
 #pragma mark - Box art (AppAssetCallback)
 
 - (void)receivedAssetForApp:(TemporaryApp *)app {
-    [self notify];
+    onMain(^{
+        self->_artworkVersion += 1;
+        [self notify];
+    });
 }
 
 - (nullable NSString *)boxArtPathForAppID:(NSString *)appID {

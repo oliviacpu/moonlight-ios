@@ -14,6 +14,7 @@ enum ShelfRoute: Hashable {
 
 // MARK: - Root
 
+@MainActor
 struct ShelfRootView: View {
     @EnvironmentObject private var model: ShelfModel
 
@@ -35,6 +36,7 @@ struct ShelfRootView: View {
     }
 }
 
+@MainActor
 struct RailNavigationView: View {
     @State private var path: [ShelfRoute] = []
 
@@ -53,6 +55,7 @@ struct RailNavigationView: View {
 
 // MARK: - Rail (pick a platform)
 
+@MainActor
 struct RailView: View {
     @EnvironmentObject private var model: ShelfModel
     @Binding var path: [ShelfRoute]
@@ -163,6 +166,7 @@ struct RailView: View {
     }
 }
 
+@MainActor
 struct PlatformTile: View {
     let section: ShelfSection
     let cover: ShelfGame?
@@ -202,6 +206,7 @@ struct PlatformTile: View {
 
 // MARK: - Shelf (pick a game)
 
+@MainActor
 struct PlatformShelfView: View {
     @EnvironmentObject private var model: ShelfModel
     let platform: String
@@ -321,6 +326,7 @@ struct PlatformShelfView: View {
     }
 }
 
+@MainActor
 struct GameCard: View {
     let game: ShelfGame
     let isRunning: Bool
@@ -359,6 +365,7 @@ struct GameCard: View {
 
 // MARK: - Cover art
 
+@MainActor
 struct CoverImage: View {
     @EnvironmentObject private var model: ShelfModel
     let game: ShelfGame
@@ -393,6 +400,7 @@ struct CoverImage: View {
 
 // MARK: - First run
 
+@MainActor
 struct FirstRunView: View {
     @EnvironmentObject private var model: ShelfModel
     @State private var address = ""
@@ -460,6 +468,7 @@ struct FirstRunView: View {
     }
 }
 
+@MainActor
 struct PairingView: View {
     @EnvironmentObject private var model: ShelfModel
 

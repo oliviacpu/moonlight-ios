@@ -117,26 +117,38 @@ final class ShelfModel: ObservableObject {
 
     private func pull() {
         let core = ShelfCore.shared
+        let newPhase: Phase
         switch core.phase {
-        case .booting: phase = .booting
-        case .needsHost: phase = .needsHost
-        case .pairing: phase = .pairing
-        case .ready: phase = .ready
-        case .hostOffline: phase = .hostOffline
-        @unknown default: phase = .booting
+        case .booting: newPhase = .booting
+        case .needsHost: newPhase = .needsHost
+        case .pairing: newPhase = .pairing
+        case .ready: newPhase = .ready
+        case .hostOffline: newPhase = .hostOffline
+        @unknown default: newPhase = .booting
         }
-        pairingPIN = core.pairingPIN
-        statusMessage = core.statusMessage
-        hostName = core.host?.name ?? ""
-        hostOnline = core.host?.online ?? false
-        runningAppID = core.host?.runningAppID
-        isStreaming = core.isStreaming
-        let newSections = ShelfGrouping.sections(for: core.apps)
-        if newSections != sections {
-            sections = newSections
+        assign(&phase, newPhase)
+        assign(&pairingPIN, core.pairingPIN)
+        assign(&statusMessage, core.statusMessage)
+        assign(&hostName, core.host?.name ?? "")
+        assign(&hostOnline, core.host?.online ?? false)
+        assign(&runningAppID, core.host?.runningAppID)
+        assign(&isStreaming, core.isStreaming)
+        assign(&sections, ShelfGrouping.sections(for: core.apps))
+        let hosts = core.discoveredHosts
+        let hostSignature = hosts.map { "\($0.uuid)|\($0.name)|\($0.online)|\($0.paired)" }
+        if hostSignature != discoveredHostSignature {
+            discoveredHostSignature = hostSignature
+            discoveredHosts = hosts
         }
-        discoveredHosts = core.discoveredHosts
-        artworkGeneration &+= 1
+        assign(&artworkGeneration, Int(core.artworkVersion))
+    }
+
+    private var discoveredHostSignature: [String] = []
+
+    private func assign<T: Equatable>(_ target: inout T, _ value: T) {
+        if target != value {
+            target = value
+        }
     }
 
     // MARK: Lookups
@@ -154,11 +166,6 @@ final class ShelfModel: ObservableObject {
     var runningGame: ShelfGame? {
         guard let runningAppID else { return nil }
         return game(appID: runningAppID)
-    }
-
-    func coverImage(for game: ShelfGame) -> UIImage? {
-        guard let path = ShelfCore.shared.boxArtPath(appID: game.appID) else { return nil }
-        return UIImage(contentsOfFile: path)
     }
 
     // MARK: Actions

@@ -7,7 +7,9 @@
 //
 
 #import "StreamFrameViewController.h"
+#if !TARGET_OS_TV
 #import "MainFrameViewController.h"
+#endif
 #import "VideoDecoderRenderer.h"
 #import "StreamManager.h"
 #import "ControllerSupport.h"

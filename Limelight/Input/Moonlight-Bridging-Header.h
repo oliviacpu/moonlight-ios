@@ -5,5 +5,5 @@
 #import <UIKit/UIKit.h>
 
 #if TARGET_OS_TV
-#import "ShelfCore.h"
+#import "../../Moonlight TV/Shelf/ShelfCore.h"
 #endif

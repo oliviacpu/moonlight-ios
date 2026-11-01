@@ -48,6 +48,8 @@ typedef NS_ENUM(NSInteger, ShelfPhase) {
 @property (nonatomic, readonly) NSArray<ShelfAppInfo *> *apps;
 @property (nonatomic, readonly) NSArray<ShelfHostInfo *> *discoveredHosts;
 @property (nonatomic, readonly) BOOL isStreaming;
+/// Increments whenever box art arrives, so cover views know to reload.
+@property (nonatomic, readonly) NSInteger artworkVersion;
 
 /// Called on the main thread after any of the properties above change.
 @property (nonatomic, copy, nullable) void (^onChange)(void);
